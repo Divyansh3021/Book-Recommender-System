@@ -30,31 +30,23 @@ def sorry():
 @app.route("/recommend_books", methods= ['POST'])
 def recommend():
     user_input = request.form.get('user_input')
+    index = np.where(pt.index == user_input)[0][0]    
+    similar_items = sorted(list(enumerate(similarity_score[index])), key= lambda x:x[1], reverse=True)[1:6]
 
-    print("Hello ji",user_input, type(user_input))
-    # print(books['Book-Title'])
-    # print(np.where(pt.index == user_input)[0][0])
-    if np.where(pt.index == user_input) != "":
-        # print("The value of index is:"+ np.where(pt.index == user_input)[0][0])
-        index = np.where(pt.index == user_input)[0][0]    
-        similar_items = sorted(list(enumerate(similarity_score[index])), key= lambda x:x[1], reverse=True)[1:6]
+    data = ["hey"]
 
-        data = ["hey"]
-
-        for i in similar_items:
-            item = []
-            temp_df = books[books['Book-Title'] == pt.index[i[0]]]
-            item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Title'].values))
-            item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Author'].values))
-            item.extend(list(temp_df.drop_duplicates('Book-Title')['Image-URL-M'].values))
-            # print(item+i)
-            data.append(item)
-        
-        print(data)
-        print(similar_items)
-        return render_template("recommend.html", data= data)
-    else:
-        return render_template("sorry.html")
+    for i in similar_items:
+        item = []
+        temp_df = books[books['Book-Title'] == pt.index[i[0]]]
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Title'].values))
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Book-Author'].values))
+        item.extend(list(temp_df.drop_duplicates('Book-Title')['Image-URL-M'].values))
+        # print(item+i)
+        data.append(item)
+    
+    print(data)
+    print(similar_items)
+    return render_template("recommend.html", data= data)
 
 if __name__ == "__main__":
     app.run(debug=True)
